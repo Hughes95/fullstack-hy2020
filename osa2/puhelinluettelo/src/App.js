@@ -68,7 +68,9 @@ const App = () => {
             .then(setTimeout(() => {
               setErrorMessage(null)
             }, 2500)   )
-
+            .then(returned => {
+              setPersons(persons.map(p => person.id !== id ? p : returned))
+            })
             .catch(error => {
               setPersons(persons.filter(n => n.id !== id))
               setErrorMessage(
