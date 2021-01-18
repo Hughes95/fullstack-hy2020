@@ -85,25 +85,24 @@ const App = () => {
 
       const toggleImportanceOf = (id) => {
         const url = `http://localhost:3001/persons/${id}`
-        const note = persons.find(n => n.id === id)
-        const changedNote = { ...note, important: note.important }
+        const person = persons.find(n => n.id === id)
+        const changedNote = { ...person, important: person.important }
       
-        if (window.confirm("Delete " + note.name + " ?")) {
+        if (window.confirm("Delete " + person.name + " ?")) {
           personsService
           .poista(id)
           .then(setErrorMessage(
-            ` ${note.name} is deleted`
+            ` ${person.name} is deleted`
           ))
           .then(setTimeout(() => {
             setErrorMessage(null)
           }, 5000)   )
-          .then(returnedNote => {
-            setPersons(persons.map(note => note.id !== id ? note : returnedNote))
+          .then(returned => {
+            setPersons(persons.map(p => p.id !== id ? p : returned))
           })
           .catch(error => {
             setPersons(persons.filter(n => n.id !== id))
           })
-          window.location.reload();
         }
       }
 
