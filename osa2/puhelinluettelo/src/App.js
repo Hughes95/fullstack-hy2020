@@ -50,30 +50,29 @@ const App = () => {
 
           console.log(error.response.data.error)
         })
+        window.location.reload()
       }
 
       const updateNumber = (id) => {
         const url = `http://localhost:3001/persons/${id}`
-        const note = persons.find(n => n.id === id)
-        const changed = { ...note, number: newNumber }
+        const person = persons.find(n => n.id === id)
+        const changed = { ...person, number: newNumber }
 
-        if( window.confirm( note.name + " is already added to phonebook, replace the old number with new one?") ) {
+        if( window.confirm( person.name + " is already added to phonebook, replace the old number with new one?") ) {
             personsService
             .update(id, changed)
             window.location.reload()
             .then(setErrorMessage(
-              ` ${note.name} is updated`
+              ` ${person.name} is updated`
             ))
             .then(setTimeout(() => {
               setErrorMessage(null)
             }, 2500)   )
-            .then(returnedNote => {
-              setPersons(persons.map(note => note.id !== id ? note : returnedNote))
-            })
+
             .catch(error => {
               setPersons(persons.filter(n => n.id !== id))
               setErrorMessage(
-                `Information of ${note.name} has already been removed from server`
+                `Information of ${person.name} has already been removed from server`
               )
               setTimeout(() => {
                 setErrorMessage(null)
