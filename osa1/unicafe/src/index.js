@@ -25,7 +25,7 @@ const StatisticLine = (props) => {
 const Statistics = (props) => {
   const ke = (props.good - props.neutral) / (props.good+ props.bad + props.neutral)
   const sum = (props.good+ props.bad + props.neutral)
-  const pos = props.good / (props.good+ props.bad + props.neutral )
+  const pos = props.good / (props.good+ props.bad + props.neutral ) * 100 +' %'
 
   if ( (props.good + props.neutral + props.bad) === 0) {
     return (
