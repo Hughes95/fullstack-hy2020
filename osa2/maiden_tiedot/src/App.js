@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import Filter from './components/Filter'
 import Countries from './components/Countries'
-import Name from './components/Name'
 import Maiden_tiedot from './components/Maiden_tiedot'
-import Note from './components/Note'
 
 
 const App = () => {
@@ -36,8 +34,6 @@ const App = () => {
     setNewNote(event.target.value)
   }
   let i = 1;
-
- const maat = <Countries id={i++} countries={notes} new_={newNote} />
  
   useEffect(hook, [])
 
@@ -66,8 +62,7 @@ const App = () => {
   return (
     <div>
         <Filter new_={newNote} handle_={handlePerson} />
-        <Countries id={i++} countries={notes} new_={newNote} />
-
+        {notes.map(n => <Countries key={i++} countries={notes} new_={newNote} />)}
     </div>
   )
 }
