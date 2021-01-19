@@ -83,7 +83,7 @@ const App = () => {
         }
       }
 
-      const toggleImportanceOf = (id) => {
+      const poistaa = (id) => {
         const url = `http://localhost:3001/persons/${id}`
         const person = persons.find(n => n.id === id)
         const changedNote = { ...person, important: person.important }
@@ -103,6 +103,7 @@ const App = () => {
           .catch(error => {
             setPersons(persons.filter(n => n.id !== id))
           })
+          window.location.reload()
         }
       }
 
@@ -144,7 +145,7 @@ const App = () => {
           {personsToShow.filter(person => person.name.includes(etsi)).map((
           (person, i) => <Person key={i} 
           person={person} 
-          painaa={() => toggleImportanceOf(person.id)}/> ))} 
+          painaa={() => poistaa(person.id)}/> ))} 
           </div>
     )
   }
