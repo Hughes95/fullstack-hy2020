@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build:ui": "rm -rf build && cd /Users/hugheschaleehong/fullstack-hy2020/frontend/puhelinluettelo && npm run build --prod && cp -r build /Users/hugheschaleehong/fullstack-hy2020/osa4",
+    "build:ui": "rm -rf build && cd /Users/hugheschaleehong/fullstack-hy2020/frontend/blogit && npm run build --prod && cp -r build /Users/hugheschaleehong/fullstack-hy2020/osa4",
     "deploy": "git push heroku main",
     "deploy:full": "npm run build:ui && git add . && git commit -m /Users/hugheschaleehong/fullstack-hy2020/osa4/uibuild && git push heroku main && npm run deploy",
     "start": "NODE_ENV=production node index.js",
