@@ -1,8 +1,7 @@
-post http://localhost:3001/api/notes
+post http://localhost:3001/api/login
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5c2VybmFtZSI6Im1sdXVra2FpIiwiaW
 
 {
-    "content": "Single page apps use authentication",
-    "important": false
+    "username" : "mluukkai",
+    "password" : "salainen"
 }

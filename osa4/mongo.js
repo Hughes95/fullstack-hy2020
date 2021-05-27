@@ -26,7 +26,9 @@ const note = new Note({
   important: true,
 })
 
-note.save().then(response => {
-  console.log('person saved!')
+Note.find({}).then(result => {
+  result.forEach(note => {
+    console.log(note)
+  })
   mongoose.connection.close()
 })
