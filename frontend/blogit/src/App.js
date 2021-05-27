@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login' 
 import Notification from './components/Notification'
+import LoginForm from './components/LoginForm'
+import Blogform from './components/Blogform'
+import Togglable from './components/Togglable'
 import './index.css'
-
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -16,6 +18,10 @@ const App = () => {
   const [title, setTitle] = useState('') 
   const [author, setAuthor] = useState('') 
   const [url, setUrl] = useState('') 
+  const [loginVisible, setLoginVisible] = useState(false)
+  const [newlikes, setLikes] = useState(0) 
+
+  const noteFormRef = useRef()
 
 
   useEffect(() => {
@@ -33,33 +39,26 @@ const App = () => {
     }
   }, [])
 
-  const addBlog = (event) => {
-    event.preventDefault()
-    const blogObject = {
-      title: title,
-      author: author,
-      url: url,
-    }
-
+  const addBlog = (blogObject) => {
+    noteFormRef.current.toggleVisibility()
     blogService
-    .create(blogObject)
-    .then(setErrorMessage(
-      `a new blog '${title}' by ${author}` 
-    ))
-    .then(setTimeout(() => {
-      setErrorMessage(null)
-    }, 5000)   )
-    .then(returned=> {
-    setUser(user.concat(returned))
-    setUsername('')
-    setPassword('')
-    })
-    .catch(error => {
-    var virhe = JSON.stringify(error.response.data.error);
-      setErrorMessage(virhe)
-
-      console.log(error.response.data.error)
-    })
+      .create(blogObject)
+      .then(setErrorMessage(
+        `a new blog '${title}' by ${author}` 
+      ))
+      .then(setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)   )
+      .then(returned=> {
+        setUser(user.concat(returned))
+        setUsername('')
+        setPassword('')
+      })
+      .catch(error => {
+        var virhe = JSON.stringify(error.response.data.error);
+        setErrorMessage(virhe)
+        console.log(error.response.data.error)
+      })
     window.location.reload()
   }
 
@@ -94,61 +93,38 @@ const App = () => {
     localStorage.clear()
   }
 
-  const handle_title = (event) => {
-    console.log(event.target.value)   
-    setTitle(event.target.value)
-  }
 
-  const handle_author = (event) => {
-    console.log(event.target.value)   
-    setAuthor(event.target.value)
-  }
+  const loginForm = () => {
+    const hideWhenVisible = { display: loginVisible ? 'none' : '' }
+    const showWhenVisible = { display: loginVisible ? '' : 'none' }
 
-  const handle_url = (event) => {
-    console.log(event.target.value)   
-    setUrl(event.target.value)
-  }
-
-  const loginForm = () => (
-    <form onSubmit={handleLogin}>
+    return (
       <div>
-        username
-          <input
-          type="text"
-          value={username}
-          name="Username"
-          onChange={({ target }) => setUsername(target.value)}
-        />
+        <div style={hideWhenVisible}>
+          <button onClick={() => setLoginVisible(true)}>log in</button>
+        </div>
+        <div style={showWhenVisible}>
+          <LoginForm
+            username={username}
+            password={password}
+            handleUsernameChange={({ target }) => setUsername(target.value)}
+            handlePasswordChange={({ target }) => setPassword(target.value)}
+            handleSubmit={handleLogin}
+          />
+          <button onClick={() => setLoginVisible(false)}>cancel</button>
+        </div>
       </div>
-      <div>
-        password
-          <input
-          type="password"
-          value={password}
-          name="Password"
-          onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
-      <button type="submit">login</button>
-    </form>      
-  )
+    )
+  }
 
-  const Create_New = () => (
-    <form onSubmit={addBlog}>
-      <div>title<input value={title} onChange={handle_title} name="title" /></div>
-      <div>author<input value={author} onChange={handle_author} name="author" /></div>
-      <div>url<input value={url} onChange={handle_url} name="url" /></div>
-      <button type="submit">create</button>
-    </form>      
-  )
 
 
 
   const logoutForm = (
     <form onSubmit={handleLogout}>
-    <div>
-    <button type="submit">logout</button>
-    </div>
+      <div>
+        <button type="submit">logout</button>
+      </div>
     </form>
   )
 
@@ -162,6 +138,37 @@ const App = () => {
     )
   }
 
+  const poistaa = (id) => {
+    const blog = blogs.find(n => n.id === id)
+
+    if (window.confirm("Remove blog " + blog.title + " by "+ blog.author)) {
+      blogService
+        .poista(id)
+        .then(setErrorMessage(
+          ` ${blog.title} is deleted`
+        ))
+        .then(setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)   )
+        .catch(error => {
+          setBlogs(null)
+        })
+      window.location.reload()
+    }
+  }
+  
+  const updateBlog = (id, like) => {
+    const blog = blogs.find(n => n.id === id)
+    setLikes(like)
+    var summa = like + 1
+    const changed = { ...blog, likes: summa}
+
+    blogService.update(id, changed)
+      .catch(error => {
+        setBlogs(null)})
+    window.location.reload()
+  }
+
 
   return (
     <div>
@@ -169,10 +176,15 @@ const App = () => {
       <p>{user.name} logged in</p>
       {logoutForm}
       <h2>create new</h2>
-      <div>{Create_New()}</div>
+      <Togglable buttonLabel="new blog"  kiinni="cancel" ref={noteFormRef}>
+        <Blogform createBlog={addBlog}
+          title={title}
+          author={author}
+          url={url}/>
+      </Togglable> 
       <p></p>
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+      {blogs.map(blog => 
+        <Blog key={blog.id} blog={blog} name={user.name}  painaa={() => poistaa(blog.id)} lisaa_likes={() => updateBlog(blog.id, blog.likes)}  />
       )}
     </div>
   )
