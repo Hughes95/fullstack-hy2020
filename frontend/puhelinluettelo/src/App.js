@@ -5,15 +5,20 @@ import personsService from './services/persons'
 import Notification from './components/Notification'
 import './index.css'
 import Person from './components/Person'
+import loginService from './services/login' 
 
 
 const App = () => {
     const [ persons, setPersons] = useState([]) 
-      const [ newName, setNewName ] = useState('')
-      const [ newNumber, setNewNumber ] = useState('')
-      const [ etsi, setNewetsi] = useState('')
-      const [showAll, setShowAll] = useState(true)
-      const [errorMessage, setErrorMessage] = useState(null)
+    const [ newName, setNewName ] = useState('')
+    const [ newNumber, setNewNumber ] = useState('')
+    const [ etsi, setNewetsi] = useState('')
+    const [showAll, setShowAll] = useState(true)
+    const [errorMessage, setErrorMessage] = useState(null)
+    const [username, setUsername] = useState('') 
+    const [password, setPassword] = useState('') 
+    const [user, setUser] = useState(null)
+
 
       useEffect(() => {
         personsService
@@ -21,6 +26,15 @@ const App = () => {
         .then(initialPersons => {
           setPersons(initialPersons)
         })
+      }, [])
+
+      useEffect(() => {
+        const loggedUserJSON = window.localStorage.getItem('loggedNoteappUser')
+        if (loggedUserJSON) {
+          const user = JSON.parse(loggedUserJSON)
+          setUser(user)
+          personsService.setToken(user.token)
+        }
       }, [])
       
       const addName = (event) => {
@@ -132,7 +146,57 @@ const App = () => {
       updateNumber(paivittaa.id)
     }
 
-      return (
+
+    const handleLogin = async (event) => {
+      event.preventDefault()
+      
+    try {
+        const user = await loginService.login({
+          username, password,
+        })
+
+        window.localStorage.setItem(
+          'loggedNoteappUser', JSON.stringify(user)
+        ) 
+        personsService.setToken(user.token)
+        setUser(user)
+        setUsername('')
+        setPassword('')
+      } catch (exception) {
+        setErrorMessage('wrong credentials')
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+      } 
+      
+    }
+
+    const loginForm = () => (
+      <form onSubmit={handleLogin}>
+        <div>
+          username
+            <input
+            type="text"
+            value={username}
+            name="Username"
+            onChange={({ target }) => setUsername(target.value)}
+          />
+        </div>
+        <div>
+          password
+            <input
+            type="password"
+            value={password}
+            name="Password"
+            onChange={({ target }) => setPassword(target.value)}
+          />
+        </div>
+        <button type="submit">login</button>
+      </form>      
+    )
+  
+
+   return (
       <div>
       <Notification message={errorMessage} />
       <h2>Phonebook</h2>    

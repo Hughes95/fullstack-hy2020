@@ -65,6 +65,9 @@ describe('Blog app', () => {
             cy.contains('mooc mooc@cs.helsinki.fi').parent().find('#view').click()
             cy.contains('mooc mooc@cs.helsinki.fi').parent().find('#likes').click()
         })
-
+        //it('blog can remove.', function () {
+           // cy.contains('mooc mooc@cs.helsinki.fi').parent().find('#view').click()
+           // cy.contains('mooc mooc@cs.helsinki.fi').parent().find('#poista').click()
+        //})
     })
 })
