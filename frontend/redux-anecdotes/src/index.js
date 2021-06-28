@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 
 import App from './App'
-import store from './components/store'
+import store from './store'
 
 //const store = createStore(anecdotesReducer, composeWithDevTools())
-store.subscribe(() => console.log(store.getState()))
+//store.subscribe(() => console.log(store.getState()))
 
 
 ReactDOM.render(

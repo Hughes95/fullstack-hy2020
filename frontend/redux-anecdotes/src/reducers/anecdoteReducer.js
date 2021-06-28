@@ -20,8 +20,6 @@ export const asObject = (anecdote) => {
   }
 }
 
-const initialState = anecdotesAtStart.map(asObject)
-
 
 const anecdotesReducer = (state = [], action) => {
   const Olio = state.filter(anecdote => anecdote.id === action.id )
@@ -37,7 +35,9 @@ const anecdotesReducer = (state = [], action) => {
   //console.log('action', action.votes)
  
   switch (action.type) {
-    case 'NEW_NOTE':
+    case 'NEW_ANECDOTE':
+      return [...state, action.data]
+    case 'UPDATE_ANECDOTE':
       return [...state, action.data]
     case 'INIT_NOTES':
       return action.data
@@ -49,6 +49,7 @@ const anecdotesReducer = (state = [], action) => {
         id: action.id,
         votes: action.votes + 1
       }
+      Service.update(id, uusiOlio2)
       return state.map(olio => olio.id !== id ? olio : uusiOlio2)
     default:
       return state  }
@@ -57,10 +58,10 @@ const anecdotesReducer = (state = [], action) => {
 
 export const createAnecdote = content => {
   return async dispatch => {
-    const newNote = await Service.createNew(content)
+    const newAnecdote = await Service.createNew(content)
     dispatch({
-      type: 'NEW_NOTE',
-      data: newNote,
+      type: 'NEW_ANECDOTE',
+      data: newAnecdote,
     })
   }
 }
@@ -72,6 +73,16 @@ export const initializeAnecdote = () => {
     dispatch({
       type: 'INIT_NOTES',
       data: anecdotes,
+    })
+  }
+}
+
+export const updateanecdote = (id, content, newvotes) => {
+  return async dispatch => {
+    const updateAnecdote = await Service.update(id, content, newvotes)
+    dispatch({
+      type: 'UPDATE_ANECDOTE',
+      data: updateAnecdote,
     })
   }
 }
